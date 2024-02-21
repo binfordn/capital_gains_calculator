@@ -11,7 +11,7 @@ program, that means they will probably come after me too)
 """
 Configure your CSV here
 """
-CSV_FILE = "trades_mini.csv"
+CSV_FILE = "example_csv.csv"
 CSV_HEADER_ASSET_NAME = "Asset"
 CSV_HEADER_TRANSACTION_TYPE = "Transaction Type"
 CSV_HEADER_QUANTITY = "Quantity"
