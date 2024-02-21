@@ -20,11 +20,18 @@ CSV_HEADER_TRANSACTION_TIMESTAMP = "UTC Timestamp"
 CSV_VALUE_BUY = "BUY"
 CSV_VALUE_BONUS = "BONUS"
 CSV_VALUE_SALE = "SELL"
+"""
+End config section
+"""
 
 
 from csv import DictReader
 from datetime import datetime, timedelta
 from operator import itemgetter
+
+
+ERROR_MESSAGE = (f"ERROR: more assets sold than bought - your CSV might be missing " +
+                 "transactions (or this might just be a harmless rounding error)")
 
 
 def get_gains_losses_for_asset(buy_list, sell_list):
@@ -88,7 +95,7 @@ def get_gains_losses_for_asset(buy_list, sell_list):
                 print(f"Successfully processed all {num_sells} sales")
                 break
             elif buy_index == num_buys:
-                print(f"Error: more assets sold than bought - your CSV may be missing transactions")
+                print(ERROR_MESSAGE)
                 break
             else:
                 current_sell = sell_list[sell_index]
@@ -111,7 +118,7 @@ def get_gains_losses_for_asset(buy_list, sell_list):
             sell_remainder = sell_chunk_amnt - buy_chunk_amnt
             buy_index += 1
             if buy_index == num_buys:
-                print(f"Error: more assets sold than bought - your CSV may be missing transactions")
+                print(ERROR_MESSAGE)
                 break
             else:
                 current_buy = buy_list[buy_index]
@@ -183,9 +190,8 @@ def main():
         for s in sells:
             sell_total += float(s[1])
 
-        print(f"Total bought: {buy_total}")
-        print(f"Total sold: {sell_total}")
-        print("Gains and losses:")
+        print(f"Total amount bought: {buy_total}")
+        print(f"Total amount sold: {sell_total}")
         get_gains_losses_for_asset(buys, sells)
 
 
