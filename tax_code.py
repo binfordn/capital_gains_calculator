@@ -8,12 +8,9 @@ program, that means they will probably come after me too)
 
 """
 
-from csv import DictReader
-from datetime import datetime, timedelta
-from operator import itemgetter
-
-
-# Configure your CSV here
+"""
+Configure your CSV here
+"""
 CSV_FILE = "trades_mini.csv"
 CSV_HEADER_ASSET_NAME = "Asset"
 CSV_HEADER_TRANSACTION_TYPE = "Transaction Type"
@@ -23,6 +20,11 @@ CSV_HEADER_TRANSACTION_TIMESTAMP = "UTC Timestamp"
 CSV_VALUE_BUY = "BUY"
 CSV_VALUE_BONUS = "BONUS"
 CSV_VALUE_SALE = "SELL"
+
+
+from csv import DictReader
+from datetime import datetime, timedelta
+from operator import itemgetter
 
 
 def get_gains_losses_for_asset(buy_list, sell_list):
@@ -45,27 +47,25 @@ def get_gains_losses_for_asset(buy_list, sell_list):
         current_sell_price = float(current_sell[2])
         current_buy_price = float(current_buy[2])
         price_diff = current_sell_price - current_buy_price
-        cost_basis = sell_chunk_amnt * current_buy_price
-        proceeds = sell_chunk_amnt * current_sell_price
         time_diff = current_sell[3] - current_buy[3]
 
         # A dict with details about each sale
         sale_details_dict = {}
+        cost_basis = sell_chunk_amnt * current_buy_price
+        proceeds = sell_chunk_amnt * current_sell_price
         sale_details_dict["Cost basis"] = cost_basis
         sale_details_dict["Proceeds"] = proceeds
         sale_details_dict["Time difference"] = time_diff
 
-        # Scenario 1: Current "buy chunk" spans > 1 "sale chunks"
+        # Case 1: Current "buy chunk" spans > 1 "sale chunks"
         if sell_chunk_amnt < buy_chunk_amnt:
             gain_loss_amnt = sell_chunk_amnt * price_diff
-
             sale_details_dict["Sale amount"] = sell_chunk_amnt
             sale_details_dict["Gain/loss"] = gain_loss_amnt
             raw_gainz.append(sale_details_dict)
+
             buy_remainder = buy_chunk_amnt - sell_chunk_amnt
-
             sell_index += 1
-
             if sell_index == num_sells:
                 print(f"Successfully processed all {num_sells} sales")
                 break
@@ -74,18 +74,16 @@ def get_gains_losses_for_asset(buy_list, sell_list):
                 sell_chunk_amnt = float(current_sell[1])
                 buy_chunk_amnt = buy_remainder
 
-        # Scenario 2: Current "sale chunk" and "buy chunk" are the same amount
+        # Case 2: Current "sale chunk" and "buy chunk" are the same amount
         elif sell_chunk_amnt == buy_chunk_amnt:
             gain_loss_amnt = sell_chunk_amnt * price_diff
-
             sale_details_dict["Sale amount"] = sell_chunk_amnt
             sale_details_dict["Gain/loss"] = gain_loss_amnt
             raw_gainz.append(sale_details_dict)
-            buy_remainder = buy_chunk_amnt - sell_chunk_amnt
 
+            buy_remainder = buy_chunk_amnt - sell_chunk_amnt
             sell_index += 1
             buy_index += 1
-
             if sell_index == num_sells:
                 print(f"Successfully processed all {num_sells} sales")
                 break
@@ -98,18 +96,20 @@ def get_gains_losses_for_asset(buy_list, sell_list):
                 sell_chunk_amnt = float(current_sell[1])
                 buy_chunk_amnt = float(current_buy[1])
 
-        # Scenario 3: Current "sale chunk" spans > 1 "buy chunks"
+        # Case 3: Current "sale chunk" spans > 1 "buy chunks"
         else:
+            # Math trick (?): use the buy chunk amount for the sale amount
+            cost_basis = buy_chunk_amnt * current_buy_price
+            proceeds = buy_chunk_amnt * current_sell_price
             gain_loss_amnt = buy_chunk_amnt * price_diff
-
+            sale_details_dict["Cost basis"] = cost_basis
+            sale_details_dict["Proceeds"] = proceeds
             sale_details_dict["Sale amount"] = buy_chunk_amnt
             sale_details_dict["Gain/loss"] = gain_loss_amnt
-
             raw_gainz.append(sale_details_dict)
+
             sell_remainder = sell_chunk_amnt - buy_chunk_amnt
-
             buy_index += 1
-
             if buy_index == num_buys:
                 print(f"Error: more assets sold than bought - your CSV may be missing transactions")
                 break
@@ -117,11 +117,6 @@ def get_gains_losses_for_asset(buy_list, sell_list):
                 current_buy = buy_list[buy_index]
                 buy_chunk_amnt = float(current_buy[1])
                 sell_chunk_amnt = sell_remainder
-
-    # Optional extra details
-    # print(f"Raw gainz:")
-    # for gl in raw_gainz:
-    #     print(gl)
 
     gainz_summary = {}
     gainz_summary["Total cost basis"] = 0
@@ -159,15 +154,15 @@ def main():
         asset = row[CSV_HEADER_ASSET_NAME]
         if asset not in csv_transaction_dict:
             csv_transaction_dict[asset] = {"buys": [], "sells": []}
-        bs = row[CSV_HEADER_TRANSACTION_TYPE]
-        qu = row[CSV_HEADER_QUANTITY]
-        pr = row[CSV_HEADER_PRICE]
-        ts = row[CSV_HEADER_TRANSACTION_TIMESTAMP]
-        if bs == CSV_VALUE_BUY or bs == CSV_VALUE_BONUS:
-            tutu = ("BUY", qu, pr, ts)
+        t_type = row[CSV_HEADER_TRANSACTION_TYPE]
+        amount = row[CSV_HEADER_QUANTITY]
+        price = row[CSV_HEADER_PRICE]
+        t_time = row[CSV_HEADER_TRANSACTION_TIMESTAMP]
+        if t_type == CSV_VALUE_BUY or t_type == CSV_VALUE_BONUS:
+            tutu = ("BUY", amount, price, t_time)
             csv_transaction_dict[asset]["buys"].append(tutu)
-        elif bs == CSV_VALUE_SALE:
-            tutu = ("SELL", qu, pr, ts)
+        elif t_type == CSV_VALUE_SALE:
+            tutu = ("SELL", amount, price, t_time)
             csv_transaction_dict[asset]["sells"].append(tutu)
         else:
             print(f"Invalid row found in CSV:\n{row}")
