@@ -1,5 +1,5 @@
 # Capital Gains and Losses Calculator
-Calculates the total cost basis, proceeds, and short/long-term gains/losses given a list of transactions.
+Given a list of transactions, calculates the total cost basis, proceeds, and short/long-term gains/losses using the FIFO (first in, first out) method.
 ## Instructions
 ### 1. Pre-setup
 Install Python on your computer if it is not there already: https://wiki.python.org/moin/BeginnersGuide/Download
@@ -38,3 +38,5 @@ Summary of gains:
 {'Total cost basis': 20000.0, 'Total proceeds': 5000.0, 'Total short-term gain/loss': -8000.0, 'Total long-term gain/loss': -7000.0}
 ```
 ### 4. Do your taxes without stress! ;)
+## Disclaimer
+Use this program at your own risk: I am not a tax professional and am not responsible for any inaccuracies in your tax return that may be caused by using this program. Please notify me if you find any mistakes with these calculations, but it is your responsibility to double check the math and ensure the correctness of your tax return.
