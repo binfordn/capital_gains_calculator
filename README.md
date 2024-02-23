@@ -27,7 +27,7 @@ Total amount bought: 300.0
 Total amount sold: 300.0
 Successfully processed all 1 sales
 Summary of gains:
-{'Total cost basis': 3000.0, 'Total proceeds': 7500.0, 'Total short-term gain/loss': 4500.0, 'Total long-term gain/loss': 0}
+{'Total cost basis': 3000.0, 'Total proceeds': 7500.0, 'Total short-term cost basis': 3000.0, 'Total short-term proceeds': 7500.0, 'Total long-term cost basis': 0, 'Total long-term proceeds': 0, 'Total short-term gain/loss': 4500.0, 'Total long-term gain/loss': 0}
 
 --- Asset: COIN2 ---
 Summary:
@@ -35,7 +35,17 @@ Total amount bought: 300.0
 Total amount sold: 200.0
 Successfully processed all 2 sales
 Summary of gains:
-{'Total cost basis': 20000.0, 'Total proceeds': 5000.0, 'Total short-term gain/loss': -8000.0, 'Total long-term gain/loss': -7000.0}
+{'Total cost basis': 20000.0, 'Total proceeds': 5000.0, 'Total short-term cost basis': 10000.0, 'Total short-term proceeds': 2000.0, 'Total long-term cost basis': 10000.0, 'Total long-term proceeds': 3000.0, 'Total short-term gain/loss': -8000.0, 'Total long-term gain/loss': -7000.0}
+
+--- Totals ---
+Total short-term proceeds:
+9500.0
+Total short-term cost basis:
+13000.0
+Total long-term proceeds:
+3000.0
+Total long-term cost basis:
+10000.0
 ```
 ### 4. Do your taxes without stress! ;)
 ## Disclaimer
