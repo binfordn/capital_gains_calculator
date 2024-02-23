@@ -65,7 +65,7 @@ def get_gains_losses_for_asset(buy_list, sell_list):
         sale_details_dict["Time difference"] = time_diff
 
         # Case 1: Current "buy chunk" spans > 1 "sale chunks"
-        if sell_chunk_amnt < buy_chunk_amnt:
+        if sell_chunk_amnt < buy_chunk_amnt or sell_chunk_amnt == buy_chunk_amnt:
             gain_loss_amnt = sell_chunk_amnt * price_diff
             sale_details_dict["Sale amount"] = sell_chunk_amnt
             sale_details_dict["Gain/loss"] = gain_loss_amnt
@@ -73,24 +73,11 @@ def get_gains_losses_for_asset(buy_list, sell_list):
 
             buy_remainder = buy_chunk_amnt - sell_chunk_amnt
             sell_index += 1
-            if sell_index == num_sells:
-                print(f"Successfully processed all {num_sells} sales")
-                break
-            else:
-                current_sell = sell_list[sell_index]
-                sell_chunk_amnt = float(current_sell[1])
-                buy_chunk_amnt = buy_remainder
 
-        # Case 2: Current "sale chunk" and "buy chunk" are the same amount
-        elif sell_chunk_amnt == buy_chunk_amnt:
-            gain_loss_amnt = sell_chunk_amnt * price_diff
-            sale_details_dict["Sale amount"] = sell_chunk_amnt
-            sale_details_dict["Gain/loss"] = gain_loss_amnt
-            raw_gainz.append(sale_details_dict)
+            # Case 2: Current "sale chunk" and "buy chunk" are the same amount
+            if sell_chunk_amnt == buy_chunk_amnt:
+                buy_index += 1
 
-            buy_remainder = buy_chunk_amnt - sell_chunk_amnt
-            sell_index += 1
-            buy_index += 1
             if sell_index == num_sells:
                 print(f"Successfully processed all {num_sells} sales")
                 break
@@ -99,9 +86,11 @@ def get_gains_losses_for_asset(buy_list, sell_list):
                 break
             else:
                 current_sell = sell_list[sell_index]
-                current_buy = buy_list[buy_index]
                 sell_chunk_amnt = float(current_sell[1])
-                buy_chunk_amnt = float(current_buy[1])
+                if sell_chunk_amnt == buy_chunk_amnt:
+                    buy_chunk_amnt = float(current_buy[1])
+                else:
+                    buy_chunk_amnt = buy_remainder
 
         # Case 3: Current "sale chunk" spans > 1 "buy chunks"
         else:
