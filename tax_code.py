@@ -128,6 +128,10 @@ def get_gains_losses_for_asset(buy_list, sell_list):
     gainz_summary = {}
     gainz_summary["Total cost basis"] = 0
     gainz_summary["Total proceeds"] = 0
+    gainz_summary["Total short-term cost basis"] = 0
+    gainz_summary["Total short-term proceeds"] = 0
+    gainz_summary["Total long-term cost basis"] = 0
+    gainz_summary["Total long-term proceeds"] = 0
     gainz_summary["Total short-term gain/loss"] = 0
     gainz_summary["Total long-term gain/loss"] = 0
     for gl in raw_gainz:
@@ -135,10 +139,16 @@ def get_gains_losses_for_asset(buy_list, sell_list):
         gainz_summary["Total proceeds"] += gl["Proceeds"]
         if gl["Time difference"] > timedelta(days=365):
             gainz_summary["Total long-term gain/loss"] += gl["Gain/loss"]
+            gainz_summary["Total long-term cost basis"] += gl["Cost basis"]
+            gainz_summary["Total long-term proceeds"] += gl["Proceeds"]
         else:
             gainz_summary["Total short-term gain/loss"] += gl["Gain/loss"]
+            gainz_summary["Total short-term cost basis"] += gl["Cost basis"]
+            gainz_summary["Total short-term proceeds"] += gl["Proceeds"]
 
     print(f"Summary of gains:\n{gainz_summary}")
+
+    return gainz_summary
 
 
 def main():
@@ -174,6 +184,11 @@ def main():
         else:
             print(f"Invalid row found in CSV:\n{row}")
 
+    total_proceeds_short = 0.0
+    total_cost_basis_short = 0.0
+    total_proceeds_long = 0.0
+    total_cost_basis_long = 0.0
+
     for asset in csv_transaction_dict:
         print(f"\n--- Asset: {asset} ---")
         print("Summary:")
@@ -192,7 +207,17 @@ def main():
 
         print(f"Total amount bought: {buy_total}")
         print(f"Total amount sold: {sell_total}")
-        get_gains_losses_for_asset(buys, sells)
+        summary = get_gains_losses_for_asset(buys, sells)
+        total_proceeds_short += summary["Total short-term proceeds"]
+        total_cost_basis_short += summary["Total short-term cost basis"]
+        total_proceeds_long += summary["Total long-term proceeds"]
+        total_cost_basis_long += summary["Total long-term cost basis"]
+
+    print(f"\n--- Totals ---")
+    print(f"Total short-term proceeds:\n{total_proceeds_short}")
+    print(f"Total short-term cost basis:\n{total_cost_basis_short}")
+    print(f"Total long-term proceeds:\n{total_proceeds_long}")
+    print(f"Total long-term cost basis:\n{total_cost_basis_long}")
 
 
 if __name__ == "__main__":
